@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.context.annotation.Scope;
 
 @Scope("singleton")
+
 public class ServerProcesses {
 
 	private static List<PythonProcess> processes;

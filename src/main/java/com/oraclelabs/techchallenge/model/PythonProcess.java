@@ -11,48 +11,40 @@ public class PythonProcess {
 	private Process process;
 	private String sessionId;
 	private String output;
+	private BufferedWriter stdInputWriter;
+	private BufferedReader stdOutputReader;
+	private BufferedReader errOutpuReader;
 
+	public PythonProcess(String sessionId) {
+		super();
+		this.sessionId = sessionId;
+	}
 
-	public String getOutput() {
-		if(!(output=getErrOutput()).isEmpty()){
+	private String getOutput() {
+		if (!(output = readOutput(errOutpuReader)).isEmpty()) {
+			return output;
+		} else {
+			output = readOutput(stdOutputReader);
 			return output;
 		}
+
+	}
+
+	private String readOutput(BufferedReader breader) {
+		String codeResult = "";
 		try {
-			BufferedReader stdOutout = new BufferedReader(new InputStreamReader(process.getInputStream()));
 			String line;
-			output="";
-			while ((line = stdOutout.readLine()) != null) {
+			while ((line = breader.readLine()) != null) {
 				System.out.println(line);
-				output += line + "\n";
+				codeResult += line + "\n";
 			}
-			stdOutout.close();
+			breader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		return output;
+		return codeResult;
 	}
-
-
-	private String getErrOutput() {
-		String errOutput="";
-		try {
-			BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-			String line;
-
-			while ((line = stdError.readLine()) != null) {
-				System.out.println(line);
-				errOutput += line + "\n";
-			}
-			stdError.close();
-		} catch (IOException e) {
-
-			e.printStackTrace();
-		}
-
-		return errOutput;
-	}
-
 
 	public Process getProcess() {
 		return process;
@@ -70,24 +62,24 @@ public class PythonProcess {
 		if (process == null) {
 			process = Runtime.getRuntime().exec("py");
 		}
+		stdInputWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+		stdOutputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		errOutpuReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+
 	}
 
 	public void close() {
 		process.destroyForcibly();
 	}
 
-	public void runCode(String code) {
-		try {
-			BufferedWriter pStdin = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-			pStdin.write(code);
-			pStdin.flush();
-			pStdin.close();
+	public String runCode(String code) throws IOException {
 
-		} catch (IOException e) {
+		init();
+		stdInputWriter.write(code);
+		stdInputWriter.flush();
+		stdInputWriter.close();
 
-			e.printStackTrace();
-		}
-
+		return getOutput();
 	}
 
 }
