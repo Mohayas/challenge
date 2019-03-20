@@ -2,48 +2,51 @@ package com.oraclelabs.techchallenge.model;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.ProcessBuilder.Redirect;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class PythonProcess {
 
 	private Process process;
 	private String sessionId;
-	private String output;
-	private BufferedWriter stdInputWriter;
-	private BufferedReader stdOutputReader;
-	private BufferedReader errOutpuReader;
 
 	public PythonProcess(String sessionId) {
 		super();
 		this.sessionId = sessionId;
 	}
 
-	private String getOutput() {
-		if (!(output = readOutput(errOutpuReader)).isEmpty()) {
-			return output;
-		} else {
-			output = readOutput(stdOutputReader);
-			return output;
-		}
+	private String getOutput() throws IOException {
 
+		BufferedReader output = new BufferedReader(new InputStreamReader(this.process.getInputStream()));
+
+		String lines="", line="";
+		do {
+			line = output.readLine();
+			if(!line.equals("[stop reading]"))
+			lines = lines + line + "\n";
+			
+		} while (!line.equals("[stop reading]"));
+
+		return lines;
 	}
 
-	private String readOutput(BufferedReader breader) {
-		String codeResult = "";
-		try {
-			String line;
-			while ((line = breader.readLine()) != null) {
-				System.out.println(line);
-				codeResult += line + "\n";
-			}
-			breader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	private String getErrOutput() throws IOException {
 
-		return codeResult;
+		BufferedReader output = new BufferedReader(new InputStreamReader(this.process.getInputStream()));
+
+		String line;
+		while (!(line = output.readLine()).equals("[stop reading]")) {
+			System.out.println(line);
+			line += line + "\n";
+		}
+		return line;
+
 	}
 
 	public Process getProcess() {
@@ -58,28 +61,42 @@ public class PythonProcess {
 		this.sessionId = sessionId;
 	}
 
-	public void init() throws IOException {
-		if (process == null) {
-			process = Runtime.getRuntime().exec("py");
-		}
-		stdInputWriter = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
-		stdOutputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		errOutpuReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+	public void init() throws IOException, InterruptedException {
+		if (this.process == null) {
+			ProcessBuilder builder = new ProcessBuilder("python", "-iu");
+			builder.redirectInput(Redirect.PIPE);
+			builder.redirectOutput(Redirect.PIPE);
+			builder.redirectError(Redirect.PIPE);
+			this.process = builder.start();
 
+		}
 	}
 
 	public void close() {
-		process.destroyForcibly();
+		this.process.destroyForcibly();
 	}
 
-	public String runCode(String code) throws IOException {
+	public String runCode(String code) throws IOException, InterruptedException {
 
 		init();
-		stdInputWriter.write(code);
-		stdInputWriter.flush();
-		stdInputWriter.close();
-
+		execute(code);
+		// getErrOutput();
 		return getOutput();
+
+	}
+
+	private void execute(String code) throws IOException {
+
+		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+
+		writer.write(code);
+		writer.newLine();
+		writer.flush();
+		writer.write("print (\"[stop reading]\")");
+		writer.newLine();
+		writer.flush();
+		// writer.close();
+
 	}
 
 }

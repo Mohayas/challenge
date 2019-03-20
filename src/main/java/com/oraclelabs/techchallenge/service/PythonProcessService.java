@@ -10,7 +10,7 @@ import com.oraclelabs.techchallenge.model.ServerProcesses;
 @Service
 public class PythonProcessService {
 
-	public String runCode(String code, String sessionId) throws IOException {
+	public String runCode(String code, String sessionId) throws IOException, InterruptedException {
 		PythonProcess pythonProcess = ServerProcesses.getProcess(sessionId);
 		if (pythonProcess == null) {
 			pythonProcess = new PythonProcess(sessionId);
