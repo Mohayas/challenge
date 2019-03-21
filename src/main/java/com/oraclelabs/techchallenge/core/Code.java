@@ -1,4 +1,4 @@
-package com.oraclelabs.techchallenge.model;
+package com.oraclelabs.techchallenge.core;
 
 public class Code {
 
