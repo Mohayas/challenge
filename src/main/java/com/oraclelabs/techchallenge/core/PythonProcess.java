@@ -29,7 +29,9 @@ public class PythonProcess {
 
 		// the subString just to remove ">>> " from the output,
 		// that's just because we're merging the sdtout with errout streams
+		if(!output.isEmpty())
 		return output.substring(4, output.length()).trim();
+		else return output;
 	}
 
 	/**

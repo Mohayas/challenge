@@ -20,7 +20,10 @@ public class PythonParser {
 
 		int indexOfFirstWhiteSpace = code.indexOf(' ');
 
-		// splitting the user code by whitespace
+		if (indexOfFirstWhiteSpace == -1)
+			throw new UnparsableCodeException();
+		
+		// splitting the user code by white space
 		String interpreter = code.substring(0, indexOfFirstWhiteSpace);
 		String pythonCode = code.substring(indexOfFirstWhiteSpace + 1, code.length());
 
