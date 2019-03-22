@@ -66,8 +66,7 @@ public class PythonProcess {
 		if (this.process == null) {
 
 			// start the python process in the interactive mode -i with
-			// unbuffered
-			// stdin, stdout and stderr
+			// unbuffered stdin, stdout and stderr -u options
 			ProcessBuilder builder = new ProcessBuilder("python", "-iu");
 
 			// piping the streams
@@ -97,7 +96,7 @@ public class PythonProcess {
 	}
 
 	/**
-	 * A function that to run code and returns the output.
+	 * A function that run code and returns the output.
 	 * 
 	 * @param code
 	 * @return

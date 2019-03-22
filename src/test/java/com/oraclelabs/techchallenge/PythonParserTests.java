@@ -1,29 +1,18 @@
 package com.oraclelabs.techchallenge;
 
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.util.Assert;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import javax.validation.constraints.AssertFalse;
-
-import static org.junit.Assert.assertThat;
-
 import com.oraclelabs.techchallenge.core.Code;
 import com.oraclelabs.techchallenge.core.PythonParser;
-import com.oraclelabs.techchallenge.core.PythonSession;
-import com.oraclelabs.techchallenge.core.ServerSessions;
 import com.oraclelabs.techchallenge.exception.UnparsableCodeException;
 import com.oraclelabs.techchallenge.exception.UnsupportedInterpreterException;
 
 @SpringBootTest
 public class PythonParserTests {
-
-	private final String sessionId = "FB2E77D47A0479900504CB3AB4A1F626D174D2D";
 
 	private final Code parsableCode = new Code("%python print(\"just testing\")");
 	private final Code unparsableCode = new Code("%pythUnparsableCode");

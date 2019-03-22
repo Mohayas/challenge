@@ -5,9 +5,9 @@ public class UnsupportedInterpreterException extends Exception {
 	private String interpreter;
 
 	public UnsupportedInterpreterException(String interpreter) {
+
 		super("Unsupported Interpreter[ " + interpreter + " ]");
 		this.interpreter = interpreter;
-
 	}
 
 	public String getInterpreter() {
