@@ -3,12 +3,13 @@ package com.oraclelabs.techchallenge.core;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.context.annotation.Scope;
-
 
 
 public class ServerSessions {
 
+	/**
+	 * list that contains all the server processes
+	 */
 	private static List<PythonSession> processes;
 	
 	static{
@@ -17,6 +18,11 @@ public class ServerSessions {
 	}
 	
 	}
+	/**
+	 * create a new python session if it doesn't existsand returns it.
+	 * @param sessionId
+	 * @return
+	 */
 	public static PythonSession getProcess(String sessionId) {
 		
 		PythonSession pythonSession = getProcessIfExist(sessionId);
@@ -27,13 +33,17 @@ public class ServerSessions {
 		return pythonSession;
 		
 	}
+	/**
+	 * Filtering process by its sessionId
+	 * @param sessionId
+	 * @return
+	 */
 	private static PythonSession getProcessIfExist(String sessionId) {
 
 		return processes.stream().filter(p -> p.getSessionId().equals(sessionId)).findFirst().orElse(null);
 	}
 
 	public static void addProcess(PythonSession process) {
-
 		processes.add(process);
 	}
 

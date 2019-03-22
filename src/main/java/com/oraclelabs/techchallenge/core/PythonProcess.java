@@ -2,26 +2,27 @@ package com.oraclelabs.techchallenge.core;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.ProcessBuilder.Redirect;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 public class PythonProcess {
 
 	private Process process;
 	private BufferedWriter writer;
 	private BufferedReader reader;
-	private BufferedReader errReader;
 
 	public PythonProcess() {
 		super();
 	}
 
+	/**
+	 * getting the output of the python process using "readOutput" function
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
 	private String getOutput() throws IOException {
 
 		String output = readOutput(reader);
@@ -31,6 +32,13 @@ public class PythonProcess {
 		return output.substring(4, output.length()).trim();
 	}
 
+	/**
+	 * Read the output of the python process
+	 * 
+	 * @param reader
+	 * @return
+	 * @throws IOException
+	 */
 	private String readOutput(BufferedReader reader) throws IOException {
 
 		String lines = "", line = "";
@@ -44,24 +52,33 @@ public class PythonProcess {
 		return lines;
 	}
 
+	/**
+	 * To initiate the process
+	 * 
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public void init() throws IOException, InterruptedException {
 
-		//checking if the process is already initiated
+		// checking if the process is already initiated.
 		if (this.process == null) {
 
+			// start the python process in the interactive mode -i with
+			// unbuffered
+			// stdin, stdout and stderr
 			ProcessBuilder builder = new ProcessBuilder("python", "-iu");
-			
-			//piping the streams
+
+			// piping the streams
 			builder.redirectInput(Redirect.PIPE);
 			builder.redirectOutput(Redirect.PIPE);
-			builder.redirectErrorStream(true);
 			
+			// merging the stdout with errou to read them all in once.
+			builder.redirectErrorStream(true);
 
 			this.process = builder.start();
 
 			writer = new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
 			reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			errReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
 			// importing sys because we need it to print errors
 			execute("from sys import stderr");
@@ -77,13 +94,17 @@ public class PythonProcess {
 		}
 	}
 
-	public void close() {
-		this.process.destroyForcibly();
-	}
-
+	/**
+	 * A function that to run code and returns the output.
+	 * 
+	 * @param code
+	 * @return
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public String runCode(String code) throws IOException, InterruptedException {
-		
-		//initiating the process
+
+		// initiating the process
 		init();
 		execute(code);
 
@@ -93,6 +114,12 @@ public class PythonProcess {
 
 	}
 
+	/**
+	 * a function that writes the code into the python process.
+	 * 
+	 * @param code
+	 * @throws IOException
+	 */
 	private void execute(String code) throws IOException {
 
 		writer.write(code);

@@ -7,15 +7,12 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.oraclelabs.techchallenge.core.Code;
 import com.oraclelabs.techchallenge.core.PythonInterpreter;
-import com.oraclelabs.techchallenge.core.PythonProcess;
 import com.oraclelabs.techchallenge.core.PythonSession;
 import com.oraclelabs.techchallenge.core.ServerSessions;
 
@@ -33,19 +30,23 @@ public class PythonController {
 			System.out.println(sessionId);
 			
 			PythonSession pythonSession=ServerSessions.getProcess(sessionId);
-			String outpu = pythonInterpreter.runCode(code.getCode(), pythonSession.getProcess());
-			return new ResponseEntity(new ApiResponse(outpu), HttpStatus.OK);
+			String output = pythonInterpreter.runCode(code.getCode(), pythonSession.getProcess());
+			return new ResponseEntity<ApiResponse>(new ApiResponse(output), HttpStatus.OK);
 
 		} catch (IOException e) {
 			e.printStackTrace();
-			return new ResponseEntity(new ApiResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ApiResponse>(new ApiResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return new ResponseEntity(new ApiResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<ApiResponse>(new ApiResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
-	
+	/**
+	 * To format the response object
+	 * 
+	 * @author mohamedelasas
+	 *
+	 */
 	public class ApiResponse {
 		private Object result;
 		
